@@ -1,3 +1,20 @@
+	const float m_length = 100.0f;
+	const float m_width = 100.0f;
+	const float m_height = 100.0f;
+	
+	const float m_v_max = 1.0f;
+
+	const std::size_t m_N_particls_in_row = 4U;
+
+	const float m_sigma = m_length / m_N_particls_in_row / 1.1224620f;
+	const float m_R_cut = m_sigma * 2.5f;
+	const float m_U_0 = 1.0f;
+
+	const float t = 3.0f;
+	const float dt = 0.0001f;
+	const std::size_t m_N_steps = t / dt;
+	const std::size_t m_N_update = 100U;
+
 0	0	0	0
 0	101.817	-289.854	-188.037
 0.01	101.811	-289.849	-188.038
