@@ -73,6 +73,13 @@ void Cell::update(float dt)
 		std::vector <r_point> periodic_positions;
 		for (auto j = std::begin(m_particles); j != std::end(m_particles); ++j)
 		{
+			if (distance(i->get()->get_pos(), j->get()->get_pos()) < m_R_cut && i != j)
+			{
+				m_U += potential_LJ(*i, *j) / 2.0f;
+				a = a + forse_LJ(*i, *j) * (1 / i->get()->get_mass());
+				break;
+			}
+
 			for (auto trans = std::begin(m_period_cond_trans); trans != std::end(m_period_cond_trans); ++trans)
 			{
 				periodic_positions.push_back(i->get()->get_pos() - *trans - j->get()->get_pos());
@@ -80,14 +87,19 @@ void Cell::update(float dt)
 			}
 			auto min_r = std::min_element(std::begin(periodic_positions), std::end(periodic_positions), [](auto r1, auto r2) {return r1.abs() < r2.abs(); });
 
-			m_U += potential_LJ(*min_r) / 2.0f;
-			a = a + forse_LJ(*min_r) * (1 / i->get()->get_mass());
+			if ((* min_r).abs() < m_R_cut)
+			{
+				m_U += potential_LJ(*min_r) / 2.0f;
+				a = a + forse_LJ(*min_r) * (1 / i->get()->get_mass());
+			}
+
+			periodic_positions.clear();
 		}
 
 		m_T += i->get()->get_T();
 
-		i->get()->accelorate_with(a * dt);
-		i->get()->move_with(i->get()->get_v() * dt + a * dt * (dt / 2));
+		i->get()->move_with(i->get()->get_v() * dt + a * dt * (dt / 2));	// r(t + dt) = r(t) + v(t) * dt + a(t) /2 * dt^2
+		i->get()->accelorate_with(a * dt);									// v(t + dt) = v(t) + a(t) * dt
 
 		m_E = m_T + m_U;
 
