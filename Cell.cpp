@@ -71,29 +71,24 @@ void Cell::update(float dt)
 
 		a = r_point(0.0f, 0.0f, 0.0f);
 		std::vector <r_point> periodic_positions;
+		auto dx = 0.0f;
+		auto dy = 0.0f;
+		auto dz = 0.0f;
+
 		for (auto j = std::begin(m_particles); j != std::end(m_particles); ++j)
 		{
-			if (distance(i->get()->get_pos(), j->get()->get_pos()) < m_R_cut && i != j)
+			dx = i->get()->get_pos().x() - j->get()->get_pos().x();
+			dy = i->get()->get_pos().y() - j->get()->get_pos().y();
+			dz = i->get()->get_pos().z() - j->get()->get_pos().z();
+			dx = std::fmin(dx, std::fmin(dx + m_size.x(), dx - m_size.x()));
+			dy = std::fmin(dy, std::fmin(dy + m_size.y(), dy - m_size.y()));
+			dz = std::fmin(dz, std::fmin(dz + m_size.z(), dz - m_size.z()));
+			auto r = r_point(dx, dy, dz);
+			if (r.abs() < m_R_cut)
 			{
-				m_U += potential_LJ(*i, *j) / 2.0f;
-				a = a + forse_LJ(*i, *j) * (1 / i->get()->get_mass());
-				break;
+				m_U += potential_LJ(r) / 2.0f;
+				a = a + forse_LJ(r) * (1 / i->get()->get_mass());
 			}
-
-			for (auto trans = std::begin(m_period_cond_trans); trans != std::end(m_period_cond_trans); ++trans)
-			{
-				periodic_positions.push_back(i->get()->get_pos() - *trans - j->get()->get_pos());
-				periodic_positions.push_back(i->get()->get_pos() + *trans - j->get()->get_pos());
-			}
-			auto min_r = std::min_element(std::begin(periodic_positions), std::end(periodic_positions), [](auto r1, auto r2) {return r1.abs() < r2.abs(); });
-
-			if ((* min_r).abs() < m_R_cut)
-			{
-				m_U += potential_LJ(*min_r) / 2.0f;
-				a = a + forse_LJ(*min_r) * (1 / i->get()->get_mass());
-			}
-
-			periodic_positions.clear();
 		}
 
 		m_T += i->get()->get_T();

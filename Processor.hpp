@@ -11,7 +11,7 @@ private:
 	const float m_width = 1.0f;
 	const float m_height = 1.0f;
 	
-	const float m_v_max = 0.001f;
+	const float m_v_max = 0.1f;
 
 	const std::size_t m_N_particls_in_row = 5U;
 
@@ -22,7 +22,7 @@ private:
 	const float t = 0.001;
 	const float dt = 0.0001f;
 	const std::size_t m_N_steps = t / dt;
-	const std::size_t m_N_update = 2U;
+	const std::size_t m_N_update = 1U;
 
 	Cell m_cell;
 
