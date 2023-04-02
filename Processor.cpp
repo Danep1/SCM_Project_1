@@ -34,9 +34,11 @@ void Processor::write_energy(std::ofstream& fstream, float t)
 void Processor::write_current_system(std::ofstream& fstream, float t)
 {
 	auto partcls = m_cell.get_particles_ptr();
-	fstream << "ITEM: TIMESTEP\n" << t << "\nITEM: NUMBER OF ATOMS\n" << m_N_particls_in_row * m_N_particls_in_row * m_N_particls_in_row << "\nITEM: BOX BOUNDS pp pp pp\n" << 0.0f << " " << m_length << "\n" << 0.0f << " " << m_width << "\n" << 0.0f << " " << m_height << "\nITEM: ATOMS id x y z E\n";
-	for (auto i = 0U; i < m_N_particls_in_row * m_N_particls_in_row * m_N_particls_in_row; ++i)
+	fstream << "ITEM: TIMESTEP\n" << t << "\nITEM: NUMBER OF ATOMS\n" << std::size(*partcls) << "\nITEM: BOX BOUNDS pp pp pp\n" << 0.0f << " " << m_length << "\n" << 0.0f << " " << m_width << "\n" << 0.0f << " " << m_height << "\nITEM: ATOMS id x y z E\n";
+	auto i = 0U;
+	for (auto prtc = std::begin(*partcls); prtc != std::end(*partcls); ++prtc)
 	{
-		fstream << i << " " << partcls->at(i).get()->get_pos() << " " << m_cell.get_E() << "\n";
+		fstream << i << " " << (*prtc).get()->get_pos() << " " << m_cell.get_E() << "\n";
+		++i;
 	}
 }

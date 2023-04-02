@@ -32,7 +32,7 @@ public:
 	explicit Cell(float sigma, float R_cut, float U_0, float v_max, const r_point& size, std::size_t N, float dt) noexcept:
 		m_sigma(sigma), m_R_cut(R_cut), m_U_0(U_0), m_U_cut(4.0f * U_0 * (std::powf(sigma / R_cut, 12U) - std::powf(sigma / R_cut, 6U))),
 		m_v_max(v_max),
-		m_size(size), m_number_of_partcls(N * N * N), m_particles(),
+		m_size(size), m_number_of_partcls(4U * N * N * N), m_particles(),
 		m_period_cond_trans({r_point(size.x(), 0.0f, 0.0f), r_point(0.0f, size.y(), 0.0f), r_point(0.0f, 0.0f,  size.z()), r_point(size.x(), size.y(), 0.0f), r_point(size.x(), -size.y(), 0.0f), 
 			r_point(size.x(), 0.0f, size.z()),  r_point(size.x(), 0.0f, -size.z()), r_point(0.0f, size.y(), size.z()), r_point(0.0f, size.y(), -size.z()), 
 			r_point(size.x(), size.y(), size.z()), r_point(size.x(), size.y(), -size.z()), r_point(size.x(), -size.y(), size.z()), r_point(-size.x(), size.y(), size.z())})
@@ -46,6 +46,11 @@ public:
 	auto get_particles_ptr() inline const noexcept
 	{
 		return std::make_shared <array_t> (m_particles);
+	}
+
+	auto get_particles_begin() inline const noexcept
+	{
+		return std::begin(m_particles);
 	}
 
 	auto  get_E() inline const noexcept
@@ -78,10 +83,15 @@ public:
 		return potential_LJ(p2.get()->get_pos() - p1.get()->get_pos());
 	}
 
+	r_point forse_LJ(const r_point& r) inline const noexcept
+	{
+		return r * (4.0f * m_U_0 / r.abs() / r.abs()) * (12.0f * std::powf(m_sigma / r.abs(), 12U) - 6.0f * std::powf(m_sigma / r.abs(), 6U));
+	}
+
+
 	r_point forse_LJ(const r_point& r1, const r_point& r2) inline const noexcept
 	{
-		auto r = r1 - r2;
-		return r * (4.0f * m_U_0 / r.abs() / r.abs()) * (12.0f * std::powf(m_sigma / r.abs(), 12U) - 6.0f * std::powf(m_sigma / r.abs(), 6U));
+		return forse_LJ(r1 - r2);
 	}
 
 	r_point forse_LJ(const particle_t& p1, const particle_t& p2) inline const noexcept
@@ -115,6 +125,7 @@ public:
 	//	return forse_garmonic(p1.get()->get_pos(), p2.get()->get_pos());
 	//}
 
+	void init_elementary_cell(const r_point& r_0, float a, float m, float dt);
 
 	void initialize(float m, float dt);
 
