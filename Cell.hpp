@@ -70,7 +70,7 @@ public:
 
 	float potential_LJ(const r_point& r) inline const noexcept
 	{
-		return 4.0f * m_U_0 * (std::powf(m_sigma / r.abs(), 12U) - std::powf(m_sigma / r.abs(), 6U)) - m_U_cut;
+		return 4.0f * m_U_0 * (std::powf(m_sigma / (r * r), 6U) - std::powf(m_sigma / (r * r), 3U));
 	}
 
 	float potential_LJ(const r_point& r1, const r_point& r2) inline const noexcept
@@ -85,7 +85,7 @@ public:
 
 	r_point forse_LJ(const r_point& r) inline const noexcept
 	{
-		return r * (4.0f * m_U_0 / r.abs() / r.abs()) * (12.0f * std::powf(m_sigma / r.abs(), 12U) - 6.0f * std::powf(m_sigma / r.abs(), 6U));
+		return r * (4.0f * m_U_0 / (r * r)) * (12.0f * std::powf(m_sigma / (r * r), 6U) - 6.0f * std::powf(m_sigma / (r * r), 3U));
 	}
 
 
@@ -127,9 +127,11 @@ public:
 
 	void init_elementary_cell(const r_point& r_0, float a, float m, float dt);
 
-	void initialize(float m, float dt);
+	void initialize_random(float m, float dt);
 
 	void initialize_lattice(std::size_t l, float m, float dt);
+
+	void initialize_dipole(float m, float dt);
 
 	void update(float dt);
 };
