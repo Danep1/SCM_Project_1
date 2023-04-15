@@ -13,6 +13,7 @@ void Cell::init_elementary_cell(const r_point& r_0, float a, float m, float dt)
 		r_init = r_0 + (*pos) * (a / 2.0f);
 		v_init = r_point(v_dist(gen), v_dist(gen), v_dist(gen)) * m_v_max;
 		m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, r_init, r_init + v_init * dt, v_init }));
+		++m_number_of_partcls;
 	}
 }
 
@@ -27,18 +28,19 @@ void Cell::initialize_random(float m, float dt)
 		auto r_init = r_point(un_dist(gen) * m_size.x(), un_dist(gen) * m_size.y(), un_dist(gen) * m_size.z());
 		auto v_init = r_point(maxwell_dist(gen), maxwell_dist(gen), maxwell_dist(gen));
 		m_particles.emplace_back(std::make_shared<Particle> (Particle{ m, 0.0f, r_init, r_init + v_init * dt, v_init }));
+		++m_number_of_partcls;
 	}
-	
 }
 
 void Cell::initialize_dipole(float m, float dt)
 {
 	auto v_init = r_point(0.0f, 0.0f, 0.0f);
 	auto c = m_size * 0.5f;
-	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c + r_point(0.2f, 0.0f, 0.0f), c, v_init }));
-	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c - r_point(0.2f, 0.0f, 0.0f), c, v_init }));
+	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c + r_point(0.15f, 0.0f, 0.0f), c, v_init }));
+	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c - r_point(0.15f, 0.0f, 0.0f), c, v_init }));		
+	++m_number_of_partcls;
+	++m_number_of_partcls;
 }
-
 
 void Cell:: initialize_lattice(std::size_t l, float m, float dt)
 {
@@ -56,38 +58,42 @@ void Cell:: initialize_lattice(std::size_t l, float m, float dt)
 	}
 }
 
-
-
 void Cell::update(float dt)
 {
-	//auto r_min = 2.0f * R_skin;
 	m_T = 0.0f;
 	m_U = 0.0f;
 
 	r_point a;
+	std::vector <float> s;
+
+	float dx;
+	float dy;
+	float dz;
+	r_point r;
+
 	for (auto i = std::begin(m_particles); i != std::end(m_particles); ++i)
 	{
 		i->get()->save_cur_pos_as_prev();
 
 		a = r_point(0.0f, 0.0f, 0.0f);
-		std::vector <r_point> periodic_positions;
-		auto dx = 0.0f;
-		auto dy = 0.0f;
-		auto dz = 0.0f;
 
 		for (auto j = std::begin(m_particles); j != std::end(m_particles); ++j)
 		{
-			dx = i->get()->get_pos().x() - j->get()->get_pos().x();
-			dy = i->get()->get_pos().y() - j->get()->get_pos().y();
-			dz = i->get()->get_pos().z() - j->get()->get_pos().z();
-			dx = std::fmin(dx, std::fmin(dx + m_size.x(), dx - m_size.x()));
-			dy = std::fmin(dy, std::fmin(dy + m_size.y(), dy - m_size.y()));
-			dz = std::fmin(dz, std::fmin(dz + m_size.z(), dz - m_size.z()));
-			auto r = r_point(dx, dy, dz);
+		/*	s = { std::fabsf(i->get()->get_pos().x() - j->get()->get_pos().x()), std::fabsf(i->get()->get_pos().x() - j->get()->get_pos().x() - m_size.x()), std::fabsf(i->get()->get_pos().x() - j->get()->get_pos().x() + m_size.x()) };
+			dx = *std::min_element(std::begin(s), std::end(s));
+
+			s = { std::fabsf(i->get()->get_pos().y() - j->get()->get_pos().y()), std::fabsf(i->get()->get_pos().y() - j->get()->get_pos().y() - m_size.y()), std::fabsf(i->get()->get_pos().y() - j->get()->get_pos().y() + m_size.y()) };
+			dy = *std::min_element(std::begin(s), std::end(s));
+
+			s = { std::fabsf(i->get()->get_pos().z() - j->get()->get_pos().z()), std::fabsf(i->get()->get_pos().z() - j->get()->get_pos().z() - m_size.z()), std::fabsf(i->get()->get_pos().z() - j->get()->get_pos().z() + m_size.z()) };
+			dz = *std::min_element(std::begin(s), std::end(s));*/
+			//r = r_point(dx, dy, dz);
+
+			r = i->get()->get_pos() - j->get()->get_pos();
 			if (r * r < m_R_cut * m_R_cut && i != j)
 			{
-				m_U += potential_LJ(r) / 2.0f;
-				a = a + forse_LJ(r) * (1 / i->get()->get_mass());
+				m_U += potential_garmonic(r) / 2.0f;
+				a = a + forse_garmonic(i->get()->get_pos(), j->get()->get_pos());
 			}
 		}
 
