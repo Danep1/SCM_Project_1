@@ -18,7 +18,7 @@ private:
 	const float m_U_cut; // = 4.0f * U_0 * (std::powf(sigma / R_cut, 12U) - std::powf(sigma / R_cut, 6U));
 	const float m_v_max;
 
-	const std::size_t m_number_of_partcls;
+	std::size_t m_number_of_partcls;
 	const r_point m_size;
 
 	float m_E = 0.0f;
@@ -32,12 +32,12 @@ public:
 	explicit Cell(float sigma, float R_cut, float U_0, float v_max, const r_point& size, std::size_t N, float dt) noexcept:
 		m_sigma(sigma), m_R_cut(R_cut), m_U_0(U_0), m_U_cut(4.0f * U_0 * (std::powf(sigma / R_cut, 12U) - std::powf(sigma / R_cut, 6U))),
 		m_v_max(v_max),
-		m_size(size), m_number_of_partcls(4U * N * N * N), m_particles(),
+		m_size(size), m_number_of_partcls(0U), m_particles(),
 		m_period_cond_trans({r_point(size.x(), 0.0f, 0.0f), r_point(0.0f, size.y(), 0.0f), r_point(0.0f, 0.0f,  size.z()), r_point(size.x(), size.y(), 0.0f), r_point(size.x(), -size.y(), 0.0f), 
 			r_point(size.x(), 0.0f, size.z()),  r_point(size.x(), 0.0f, -size.z()), r_point(0.0f, size.y(), size.z()), r_point(0.0f, size.y(), -size.z()), 
 			r_point(size.x(), size.y(), size.z()), r_point(size.x(), size.y(), -size.z()), r_point(size.x(), -size.y(), size.z()), r_point(-size.x(), size.y(), size.z())})
 	{
-		initialize_lattice(N, 1.0f, dt);
+		initialize_dipole(1.0f, dt);
 	}
 
 	~Cell() noexcept = default;
@@ -127,7 +127,7 @@ public:
 
 	void init_elementary_cell(const r_point& r_0, float a, float m, float dt);
 
-	void initialize(float m, float dt);
+	void initialize_dipole(float m, float dt);
 
 	void initialize_lattice(std::size_t l, float m, float dt);
 
