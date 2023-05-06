@@ -13,10 +13,13 @@ private:
 	r_point m_v;
 
 public:
+	r_point m_a;
+
+public:
 	Particle() noexcept = default;
 
 	explicit Particle(float mass, float charge, const r_point& pos, const r_point& prev_pos, const r_point& v) noexcept :
-		m_mass(mass), m_charge(charge), m_pos(pos), m_v(v), m_prev_pos(prev_pos)
+		m_mass(mass), m_charge(charge), m_pos(pos), m_v(v), m_prev_pos(prev_pos), m_a(r_point(0.0f, 0.0f, 0.0f))
 	{}
 
 	~Particle() noexcept = default;
@@ -57,10 +60,8 @@ public:
 		m_prev_pos = m_pos;
 	}
 
+	void update(float dt) noexcept;
+
 	void move_with(const r_point& dr) noexcept;
-
-
-	void accelorate_with(const r_point& dv) noexcept;
-
 };
 

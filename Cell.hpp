@@ -88,7 +88,6 @@ public:
 		return r * ( 4.0f * m_U_0 / (r * r)) * (12.0f * std::powf(m_sigma / (r * r), 6U) - 6.0f * std::powf(m_sigma / (r * r), 3U));
 	}
 
-
 	r_point forse_LJ(const r_point& r1, const r_point& r2) inline const noexcept
 	{
 		return forse_LJ(r1 - r2);
@@ -101,7 +100,7 @@ public:
 
 	float potential_garmonic(const r_point& r) inline const noexcept
 	{
-		return std::powf(r.abs() - 0.1f, 2U) / 2;
+		return std::powf(r.abs() - 0.25f, 2U) / 2;
 	}
 
 	float potential_garmonic(const r_point& r1, const r_point& r2) inline const noexcept
@@ -114,20 +113,24 @@ public:
 		return potential_garmonic(p2.get()->get_pos() - p1.get()->get_pos());
 	}
 
-	r_point forse_garmonic(const r_point& r1, const r_point& r2) inline const noexcept
+	r_point forse_garmonic(const r_point& r, float r0) inline const noexcept
 	{
-		auto r = r2 - r1;
-		return r * ((r.abs() - 0.1f) / r.abs());
+		return r * ((r.abs() - r0) / r.abs());
 	}
 
-	r_point forse_garmonic(const particle_t& p1, const particle_t& p2) inline const noexcept
+	r_point forse_garmonic(const r_point& r1, const r_point& r2, float r0) inline const noexcept
 	{
-		return forse_garmonic(p1.get()->get_pos(), p2.get()->get_pos());
+		return forse_garmonic(r2 - r1, r0);
+	}
+
+	r_point forse_garmonic(const particle_t& p1, const particle_t& p2, float r0) inline const noexcept
+	{
+		return forse_garmonic(p1.get()->get_pos(), p2.get()->get_pos(), r0);
 	}
 
 	void init_elementary_cell(const r_point& r_0, float a, float m, float dt);
 
-	void initialize_random(float m, float dt);
+	void initialize_dipole(float m, float dt);
 
 	void initialize_lattice(std::size_t l, float m, float dt);
 
