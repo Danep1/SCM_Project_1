@@ -7,8 +7,10 @@ float distance(const r_point& v1, const r_point& v2)
 
 void Particle::update(float dt) noexcept
 {
+	this->save_cur_pos_as_prev();
 	m_v = m_v + m_a * dt; // именно в таком порядке, иначе будет рост энергии
-	m_pos = m_pos + m_v * dt + m_a * dt * (dt / 2.0f);
+	m_pos = m_pos + m_v * dt + m_a * dt * (dt / 2.0f);		
+	m_a = r_point(0.0f, 0.0f, 0.0f);
 }
 
 

@@ -21,13 +21,13 @@ void Cell::initialize_dipole(float m, float dt)
 {
 	auto v_init = r_point(0.0f, 0.0f, 0.0f);
 	auto c = m_size * 0.5f;
-	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c + r_point(0.15f, 0.0f, 0.0f), c, v_init}));
+	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c + r_point(0.15f, 0.0f, 0.0f), c, v_init }));
 	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c - r_point(0.15f, 0.0f, 0.0f), c, v_init }));
 	++m_number_of_partcls;
 	++m_number_of_partcls;
 }
 
-void Cell:: initialize_lattice(std::size_t l, float m, float dt)
+void Cell::initialize_lattice(std::size_t l, float m, float dt)
 {
 	auto a = m_size.x() / l;
 	auto r_0 = r_point(1.0f, 1.0f, 1.0f) * 0.05f;
@@ -44,47 +44,41 @@ void Cell:: initialize_lattice(std::size_t l, float m, float dt)
 }
 
 
-
 void Cell::update(float dt)
 {
 	m_T = 0.0f;
 	m_U = 0.0f;
-	r_point a;
+
+	float dx, dy, dz;
+	auto s = { 0.0f };
+	r_point min_r;
+
 	for (auto i = std::begin(m_particles); i != std::end(m_particles); ++i)
 	{
-		i->get()->save_cur_pos_as_prev();
-		std::vector <r_point> periodic_positions;
-
 		for (auto j = std::begin(m_particles); j != i; ++j)
-		for (auto j = std::begin(m_particles); j != std::end(m_particles); ++j)
 		{
-		/*	s = { std::fabsf(i->get()->get_pos().x() - j->get()->get_pos().x()), std::fabsf(i->get()->get_pos().x() - j->get()->get_pos().x() - m_size.x()), std::fabsf(i->get()->get_pos().x() - j->get()->get_pos().x() + m_size.x()) };
+			dx = i->get()->get_pos().x() - j->get()->get_pos().x();
+			s = {dx, dx + m_size.x(), dx - m_size.x()};
 			dx = *std::min_element(std::begin(s), std::end(s));
 
-			s = { std::fabsf(i->get()->get_pos().y() - j->get()->get_pos().y()), std::fabsf(i->get()->get_pos().y() - j->get()->get_pos().y() - m_size.y()), std::fabsf(i->get()->get_pos().y() - j->get()->get_pos().y() + m_size.y()) };
+			dy = i->get()->get_pos().y() - j->get()->get_pos().y();
+			s = { dy, dy + m_size.y(), dy - m_size.y() };
 			dy = *std::min_element(std::begin(s), std::end(s));
 
-			s = { std::fabsf(i->get()->get_pos().z() - j->get()->get_pos().z()), std::fabsf(i->get()->get_pos().z() - j->get()->get_pos().z() - m_size.z()), std::fabsf(i->get()->get_pos().z() - j->get()->get_pos().z() + m_size.z()) };
-			dz = *std::min_element(std::begin(s), std::end(s));*/
-			//r = r_point(dx, dy, dz);
+			dz = i->get()->get_pos().z() - j->get()->get_pos().z();
+			s = { dz, dz + m_size.z(), dz - m_size.z() };
+			dz = *std::min_element(std::begin(s), std::end(s));
 
-			r = i->get()->get_pos() - j->get()->get_pos();
-			if (r * r < m_R_cut * m_R_cut && i != j)
-			{
-				m_U += potential_garmonic(r) / 2.0f;
-				a = a + forse_garmonic(i->get()->get_pos(), j->get()->get_pos());
-			auto min_r = std::min_element(std::begin(periodic_positions), std::end(periodic_positions), [](auto r1, auto r2) {return r1.abs() < r2.abs(); });
-			
-			m_U += potential_LJ(*min_r);
-			i->get()->m_a = i->get()->m_a + forse_LJ(*min_r);
-			j->get()->m_a = j->get()->m_a - forse_LJ(*min_r);
-			a = a + forse_LJ(*min_r) * (1 / i->get()->get_mass());
+			min_r = r_point(dx, dy, dz);
+			m_U += potential_LJ(min_r);
+
+			i->get()->m_a = i->get()->m_a + forse_LJ(min_r);
+			j->get()->m_a = j->get()->m_a - forse_LJ(min_r);
 		}
-	}	
+	}
 	for (auto i = std::begin(m_particles); i != std::end(m_particles); ++i)
 	{
 		i->get()->update(dt);
-		m_E = m_T + m_U;
 
 		if (i->get()->get_pos().x() < 0.0f)
 		{
@@ -110,8 +104,6 @@ void Cell::update(float dt)
 		{
 			i->get()->move_with(r_point(0.0f, 0.0f, -m_size.z()));
 		}
-
-		i->get()->m_a = r_point(0.0f, 0.0f, 0.0f);
 
 		m_T += i->get()->get_T();
 		m_E = m_T + m_U;
