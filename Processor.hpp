@@ -15,14 +15,14 @@ private:
 
 	const std::size_t m_N_particls_in_row = 5U;
 
-	const float m_sigma = 0.2f;
+	const float m_sigma = m_length / m_N_particls_in_row / 1.1224620f * 0.5f;
 	const float m_R_cut = m_sigma * 2.5f;
 	const float m_U_0 = 1.0f;
 
-	const float t = 3.0e+0;
+	const float t = 3.0e-4;
 	const float dt = 1.0e-5;
 	const std::size_t m_N_steps = t / dt;
-	const std::size_t m_N_update = 100U;
+	const std::size_t m_N_update = 1U;
 
 	Cell m_cell;
 

@@ -16,8 +16,3 @@ void Particle::move_with(const r_point& dr) noexcept
 {
 	m_pos = m_pos + dr;
 }
-//
-//void Particle::accelorate_with(const r_point& dv) noexcept
-//{
-//	m_v = m_v + dv;
-//}

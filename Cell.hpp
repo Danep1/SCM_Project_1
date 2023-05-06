@@ -37,7 +37,7 @@ public:
 			r_point(size.x(), 0.0f, size.z()),  r_point(size.x(), 0.0f, -size.z()), r_point(0.0f, size.y(), size.z()), r_point(0.0f, size.y(), -size.z()), 
 			r_point(size.x(), size.y(), size.z()), r_point(size.x(), size.y(), -size.z()), r_point(size.x(), -size.y(), size.z()), r_point(-size.x(), size.y(), size.z())})
 	{
-		initialize_dipole(1.0f, dt);
+		initialize_lattice(N, 1.0f, dt);
 	}
 
 	~Cell() noexcept = default;

@@ -10,7 +10,7 @@ void Cell::init_elementary_cell(const r_point& r_0, float a, float m, float dt)
 	r_point v_init;
 	for (auto pos = std::begin(positions); pos != std::end(positions); ++pos)
 	{
-		r_init = r_0 + (*pos) * (a / 2.0f);
+		r_init = r_0 + (*pos) * (a * 0.5f);
 		v_init = r_point(v_dist(gen), v_dist(gen), v_dist(gen)) * m_v_max;
 		m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, r_init, r_init + v_init * dt, v_init }));
 		++m_number_of_partcls;
@@ -58,16 +58,16 @@ void Cell::update(float dt)
 
 		for (auto j = std::begin(m_particles); j != i; ++j)
 		{
-			//for (auto trans = std::begin(m_period_cond_trans); trans != std::end(m_period_cond_trans); ++trans)
-			//{
-			//	periodic_positions.push_back(i->get()->get_pos() - *trans - j->get()->get_pos());
-			//	periodic_positions.push_back(i->get()->get_pos() + *trans - j->get()->get_pos());
-			//}
-			//auto min_r = std::min_element(std::begin(periodic_positions), std::end(periodic_positions), [](auto r1, auto r2) {return r1.abs() < r2.abs(); });
+			for (auto trans = std::begin(m_period_cond_trans); trans != std::end(m_period_cond_trans); ++trans)
+			{
+				periodic_positions.push_back(i->get()->get_pos() - *trans - j->get()->get_pos());
+				periodic_positions.push_back(i->get()->get_pos() + *trans - j->get()->get_pos());
+			}
+			auto min_r = std::min_element(std::begin(periodic_positions), std::end(periodic_positions), [](auto r1, auto r2) {return r1.abs() < r2.abs(); });
 			
-			m_U += potential_LJ(i->get()->get_pos(), j->get()->get_pos());
-			i->get()->m_a = i->get()->m_a + forse_LJ(i->get()->get_pos(), j->get()->get_pos());
-			j->get()->m_a = j->get()->m_a - forse_LJ(i->get()->get_pos(), j->get()->get_pos());
+			m_U += potential_LJ(*min_r);
+			i->get()->m_a = i->get()->m_a + forse_LJ(*min_r);
+			j->get()->m_a = j->get()->m_a - forse_LJ(*min_r);
 		}
 
 	}	
