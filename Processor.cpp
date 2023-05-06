@@ -11,6 +11,7 @@ void Processor::start()
 	//write_current_system(file_dots, 0.0f);
 	//write_energy(file_energy, 0.0f);
 
+
 	for (auto step = 0U; step < m_N_steps / m_N_update; ++step)
 	{
 		for (auto update_step = 0U; update_step < m_N_update; ++update_step)
