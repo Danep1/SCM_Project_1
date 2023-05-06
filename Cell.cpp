@@ -50,32 +50,30 @@ void Cell::update(float dt)
 	m_T = 0.0f;
 	m_U = 0.0f;
 
-	r_point a;
 	for (auto i = std::begin(m_particles); i != std::end(m_particles); ++i)
 	{
 		i->get()->save_cur_pos_as_prev();
 
-		a = r_point(0.0f, 0.0f, 0.0f);
 		std::vector <r_point> periodic_positions;
-		for (auto j = std::begin(m_particles); j != std::end(m_particles); ++j)
-		{
-			for (auto trans = std::begin(m_period_cond_trans); trans != std::end(m_period_cond_trans); ++trans)
-			{
-				periodic_positions.push_back(i->get()->get_pos() - *trans - j->get()->get_pos());
-				periodic_positions.push_back(i->get()->get_pos() + *trans - j->get()->get_pos());
-			}
-			auto min_r = std::min_element(std::begin(periodic_positions), std::end(periodic_positions), [](auto r1, auto r2) {return r1.abs() < r2.abs(); });
 
-			m_U += potential_LJ(*min_r) / 2.0f;
-			a = a + forse_LJ(*min_r) * (1 / i->get()->get_mass());
+		for (auto j = std::begin(m_particles); j != i; ++j)
+		{
+			//for (auto trans = std::begin(m_period_cond_trans); trans != std::end(m_period_cond_trans); ++trans)
+			//{
+			//	periodic_positions.push_back(i->get()->get_pos() - *trans - j->get()->get_pos());
+			//	periodic_positions.push_back(i->get()->get_pos() + *trans - j->get()->get_pos());
+			//}
+			//auto min_r = std::min_element(std::begin(periodic_positions), std::end(periodic_positions), [](auto r1, auto r2) {return r1.abs() < r2.abs(); });
+			
+			m_U += potential_LJ(i->get()->get_pos(), j->get()->get_pos());
+			i->get()->m_a = i->get()->m_a + forse_LJ(i->get()->get_pos(), j->get()->get_pos());
+			j->get()->m_a = j->get()->m_a - forse_LJ(i->get()->get_pos(), j->get()->get_pos());
 		}
 
-		m_T += i->get()->get_T();
-
-		i->get()->accelorate_with(a * dt);
-		i->get()->move_with(i->get()->get_v() * dt + a * dt * (dt / 2));
-
-		m_E = m_T + m_U;
+	}	
+	for (auto i = std::begin(m_particles); i != std::end(m_particles); ++i)
+	{
+		i->get()->update(dt);
 
 		if (i->get()->get_pos().x() < 0.0f)
 		{
@@ -101,5 +99,10 @@ void Cell::update(float dt)
 		{
 			i->get()->move_with(r_point(0.0f, 0.0f, -m_size.z()));
 		}
+
+		i->get()->m_a = r_point(0.0f, 0.0f, 0.0f);
+
+		m_T += i->get()->get_T();
+		m_E = m_T + m_U;
 	}
 }

@@ -88,7 +88,6 @@ public:
 		return r * (4.0f * m_U_0 / r.abs() / r.abs()) * (12.0f * std::powf(m_sigma / r.abs(), 12U) - 6.0f * std::powf(m_sigma / r.abs(), 6U));
 	}
 
-
 	r_point forse_LJ(const r_point& r1, const r_point& r2) inline const noexcept
 	{
 		return forse_LJ(r1 - r2);
@@ -99,31 +98,35 @@ public:
 		return forse_LJ(p1.get()->get_pos(), p2.get()->get_pos());
 	}
 
-	//float potential_garmonic(const r_point& r) inline const noexcept
-	//{
-	//	return std::powf(r.abs() - 0.1f, 2U) / 2;
-	//}
+	float potential_garmonic(const r_point& r) inline const noexcept
+	{
+		return std::powf(r.abs() - 0.25f, 2U) / 2;
+	}
 
-	//float potential_garmonic(const r_point& r1, const r_point& r2) inline const noexcept
-	//{
-	//	return potential_garmonic(r2 - r1);
-	//}
+	float potential_garmonic(const r_point& r1, const r_point& r2) inline const noexcept
+	{
+		return potential_garmonic(r2 - r1);
+	}
 
-	//float potential_garmonic(const particle_t& p1, const particle_t& p2) inline const noexcept
-	//{
-	//	return potential_garmonic(p2.get()->get_pos() - p1.get()->get_pos());
-	//}
+	float potential_garmonic(const particle_t& p1, const particle_t& p2) inline const noexcept
+	{
+		return potential_garmonic(p2.get()->get_pos() - p1.get()->get_pos());
+	}
 
-	//r_point forse_garmonic(const r_point& r1, const r_point& r2) inline const noexcept
-	//{
-	//	auto r = r2 - r1;
-	//	return r * ((r.abs() - 0.1f) / r.abs());
-	//}
+	r_point forse_garmonic(const r_point& r, float r0) inline const noexcept
+	{
+		return r * ((r.abs() - r0) / r.abs());
+	}
 
-	//r_point forse_garmonic(const particle_t& p1, const particle_t& p2) inline const noexcept
-	//{
-	//	return forse_garmonic(p1.get()->get_pos(), p2.get()->get_pos());
-	//}
+	r_point forse_garmonic(const r_point& r1, const r_point& r2, float r0) inline const noexcept
+	{
+		return forse_garmonic(r2 - r1, r0);
+	}
+
+	r_point forse_garmonic(const particle_t& p1, const particle_t& p2, float r0) inline const noexcept
+	{
+		return forse_garmonic(p1.get()->get_pos(), p2.get()->get_pos(), r0);
+	}
 
 	void init_elementary_cell(const r_point& r_0, float a, float m, float dt);
 

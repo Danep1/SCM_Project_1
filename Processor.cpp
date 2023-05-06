@@ -8,8 +8,8 @@ void Processor::start()
 	file_dots.open("data.dump");
 	file_energy.open("energy.txt");
 
-	write_current_system(file_dots, 0.0f);
-	write_energy(file_energy, 0.0f);
+	//write_current_system(file_dots, 0.0f);
+	//write_energy(file_energy, 0.0f);
 
 	for (auto step = 0U; step < m_N_steps / m_N_update; ++step)
 	{
