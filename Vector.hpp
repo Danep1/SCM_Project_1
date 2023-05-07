@@ -2,17 +2,19 @@
 #include <cmath>
 #include <iostream>
 
+using number_t = double;
+
 class r_point
 {
 private:
-	float m_x;
-	float m_y;
-	float m_z;
+	number_t m_x;
+	number_t m_y;
+	number_t m_z;
 
 public:
 	r_point() noexcept = default;
 
-	explicit r_point(float x, float y, float z) noexcept :
+	explicit r_point(number_t x, number_t y, number_t z) noexcept :
 		m_x(x), m_y(y), m_z(z)
 	{}
 
@@ -46,9 +48,9 @@ public:
 
 	r_point operator- (const r_point& v2) const;
 
-	r_point operator* (float a) const;
+	r_point operator* (number_t a) const;
 
-	float operator* (const r_point& v2) const;
+	number_t operator* (const r_point& v2) const;
 
 	r_point& operator= (const r_point& other) = default;
 

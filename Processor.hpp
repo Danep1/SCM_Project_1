@@ -7,22 +7,22 @@
 class Processor
 {
 private:
-	const float m_length = 1.0f;
-	const float m_width = 1.0f;
-	const float m_height = 1.0f;
+	const number_t m_length = 1.0;
+	const number_t m_width = 1.0;
+	const number_t m_height = 1.0;
 	
-	const float m_v_max = 0.001f;
+	const number_t m_v_max = 1.0e+0;
 
 	const std::size_t m_N_particls_in_row = 5U;
 
-	const float m_sigma = 0.1f;//m_length / m_N_particls_in_row / 1.095f / 2.0f;
-	const float m_R_cut = m_sigma * 2.5f;
-	const float m_U_0 = 1.0f;
+	const number_t m_sigma = m_length / m_N_particls_in_row / 1.095 / std::sqrt(2.0);
+	const number_t m_R_cut = m_sigma * 2.5;
+	const number_t m_U_0 = 1.0;
 
-	const float t = 5.0e+1;
-	const float dt = 5.0e-6;
+	const number_t t = 1.0e-1;
+	const number_t dt = 1.0e-5;
 	const std::size_t m_N_steps = t / dt;
-	const std::size_t m_N_update = 1000U;
+	const std::size_t m_N_update = 100U;
 
 	Cell m_cell;
 
@@ -33,7 +33,7 @@ public:
 
 	void start();
 
-	void write_energy(std::ofstream& fstream, float t);
+	void write_energy(std::ofstream& fstream, number_t t);
 
-	void write_current_system(std::ofstream& fstream, float t);
+	void write_current_system(std::ofstream& fstream, number_t t);
 };
