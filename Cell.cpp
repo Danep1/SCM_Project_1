@@ -21,8 +21,8 @@ void Cell::initialize_dipole(float m, float dt)
 {
 	auto v_init = r_point(0.0f, 0.0f, 0.0f);
 	auto c = m_size * 0.5f;
-	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c + r_point(0.15f, 0.0f, 0.0f), c, v_init }));
-	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c - r_point(0.15f, 0.0f, 0.0f), c, v_init }));
+	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c + r_point(1.0f, 0.0f, 0.0f) * 0.43f, c, v_init }));
+	m_particles.emplace_back(std::make_shared<Particle>(Particle{ m, 0.0f, c - r_point(1.0f, 0.0f, 0.0f) * 0.43f, c, v_init }));
 	++m_number_of_partcls;
 	++m_number_of_partcls;
 }
@@ -50,7 +50,7 @@ void Cell::update(float dt)
 	m_U = 0.0f;
 
 	float dx, dy, dz;
-	auto s = { 0.0f };
+	std::vector <float> s;
 	r_point min_r;
 
 	for (auto i = std::begin(m_particles); i != std::end(m_particles); ++i)
@@ -59,21 +59,24 @@ void Cell::update(float dt)
 		{
 			dx = i->get()->get_pos().x() - j->get()->get_pos().x();
 			s = {dx, dx + m_size.x(), dx - m_size.x()};
-			dx = *std::min_element(std::begin(s), std::end(s));
+			dx = *std::min_element(std::begin(s), std::end(s), [](auto l, auto r) {return std::abs(l) < std::abs(r); });
 
 			dy = i->get()->get_pos().y() - j->get()->get_pos().y();
 			s = { dy, dy + m_size.y(), dy - m_size.y() };
-			dy = *std::min_element(std::begin(s), std::end(s));
+			dy = *std::min_element(std::begin(s), std::end(s), [](auto l, auto r) {return std::abs(l) < std::abs(r); });
 
 			dz = i->get()->get_pos().z() - j->get()->get_pos().z();
 			s = { dz, dz + m_size.z(), dz - m_size.z() };
-			dz = *std::min_element(std::begin(s), std::end(s));
+			dz = *std::min_element(std::begin(s), std::end(s), [](auto l, auto r) {return std::abs(l) < std::abs(r); });
 
 			min_r = r_point(dx, dy, dz);
-			m_U += potential_LJ(min_r);
 
-			i->get()->m_a = i->get()->m_a + forse_LJ(min_r);
-			j->get()->m_a = j->get()->m_a - forse_LJ(min_r);
+			if (min_r * min_r < m_R_cut * m_R_cut)
+			{
+				m_U += potential_LJ(min_r);
+				i->get()->m_a = i->get()->m_a + forse_LJ(min_r);
+				j->get()->m_a = j->get()->m_a - forse_LJ(min_r);
+			}
 		}
 	}
 	for (auto i = std::begin(m_particles); i != std::end(m_particles); ++i)

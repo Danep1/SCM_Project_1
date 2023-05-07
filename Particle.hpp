@@ -64,4 +64,3 @@ public:
 
 	void move_with(const r_point& dr) noexcept;
 };
-

@@ -15,7 +15,7 @@ private:
 	const float m_sigma;
 	const float m_R_cut;
 	const float m_U_0;
-	const float m_U_cut; // = 4.0f * U_0 * (std::powf(sigma / R_cut, 12U) - std::powf(sigma / R_cut, 6U));
+	const float m_U_cut = 4.0f * m_U_0 * (std::powf(m_sigma / m_R_cut, 12U) - std::powf(m_sigma / m_R_cut, 6U));
 	const float m_v_max;
 
 	std::size_t m_number_of_partcls;
@@ -37,7 +37,7 @@ public:
 			r_point(size.x(), 0.0f, size.z()),  r_point(size.x(), 0.0f, -size.z()), r_point(0.0f, size.y(), size.z()), r_point(0.0f, size.y(), -size.z()),
 			r_point(size.x(), size.y(), size.z()), r_point(size.x(), size.y(), -size.z()), r_point(size.x(), -size.y(), size.z()), r_point(-size.x(), size.y(), size.z()) })
 	{
-		initialize_lattice(N, 1.0f, dt);
+		initialize_dipole(1.0f, dt);
 	}
 
 	~Cell() noexcept = default;
